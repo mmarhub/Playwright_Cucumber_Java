@@ -56,7 +56,7 @@ public class BasePage {
     // Attach message to the cucumber scenario html report
     public void scenarioLog(String message) {
         browserManager.getScenario().attach(
-                message,
+                "🔹 " + message,
                 "text/plain",
                 "Thread : " + Thread.currentThread().getName()
         );
@@ -79,5 +79,23 @@ public class BasePage {
 
     public boolean isElementVisible(String selector) {
         return browserManager.getPage().locator(selector).isVisible();
+    }
+
+    public void clickAndSwitchToChildTab(String selector) {
+        browserManager.setPage(browserManager.getContext().waitForPage(() -> {
+            browserManager.getPage().locator(selector).click();
+        }));
+
+        browserManager.getPage().bringToFront();
+    }
+
+    public void closeChildTabAndSwitchToParentTab() {
+        Page currentPage = browserManager.getPage();
+        currentPage.close();
+
+        // Assuming the parent page is the first page in the context
+        Page parentPage = browserManager.getContext().pages().getFirst();
+        browserManager.setPage(parentPage);
+        browserManager.getPage().bringToFront();
     }
 }

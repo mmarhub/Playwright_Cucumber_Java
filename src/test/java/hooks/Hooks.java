@@ -34,7 +34,7 @@ public class Hooks {
     public void tearDown(Scenario scenario) {
         if (scenario.isFailed()) {
             byte[] screenshot = browserManager.takeScreenshot();
-            scenario.attach(screenshot, "image/png", "screenshot");
+            scenario.attach(screenshot, "image/png", "📸 " + "screenshot");
         }
         browserManager.tearDown();
     }

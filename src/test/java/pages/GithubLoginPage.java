@@ -10,13 +10,17 @@ public class GithubLoginPage extends BasePage {
     private final String passwordInput = "input[name='password']";
     private final String signInButton = "input[name='commit']";
     private final String errorAlert = "div[id='js-flash-container'] div[role='alert']";
+    private final String pwDiscordIcon = "a[aria-label='Discord server']";
+    private final String discordSiteHomeIcon = "//header[contains(@class, 'wrapperDesktop')]//a[contains(@class, 'logoLink')]";
+    private final String communityMenuLink = "//a[contains(text(), 'Community')]";
+    private final String pwWelcomeTitle = "header h1";
 
     public GithubLoginPage(BrowserManager browserManager) {
         super(browserManager);
     }
 
-    public void navigateToHome() {
-        navigate("https://github.com/");
+    public void navigateToHome(String url) {
+        navigate(url);
     }
 
     public void clickSignIn() {
@@ -56,5 +60,22 @@ public class GithubLoginPage extends BasePage {
                 "}").toString();
 
         //return textTrim(errorAlert);
+    }
+
+    public void clickDiscordIcon() {
+        clickAndSwitchToChildTab(pwDiscordIcon);
+    }
+
+    public boolean isDiscordHomePageVisible() {
+        waitForElementVisible(discordSiteHomeIcon, 10000);
+        return isElementVisible(discordSiteHomeIcon);
+    }
+
+    public void clickCommunityMenu() {
+        click(communityMenuLink);
+    }
+
+    public String getPWWelcomeText() {
+        return textTrim(pwWelcomeTitle);
     }
 }

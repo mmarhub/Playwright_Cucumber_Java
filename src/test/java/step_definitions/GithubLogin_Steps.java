@@ -19,7 +19,7 @@ public class GithubLogin_Steps {
     @Given("I navigate to GitHub homepage")
     public void iNavigateToGitHubHomepage() {
         // delegate to LoginPage which contains navigation logic
-        githubLoginPage.navigateToHome();
+        githubLoginPage.navigateToHome("https://github.com/");
     }
 
     @When("I click on Sign in link")
@@ -49,5 +49,40 @@ public class GithubLogin_Steps {
         assertThat(alertText.trim())
                 .as("Error message validation")
                 .isEqualTo(errorMessage.trim());
+    }
+
+    @Given("I open the webpage {string}")
+    public void iOpenTheWebpage(String url) {
+        githubLoginPage.navigateToHome(url);
+    }
+
+    @When("I click the Discord icon and navigate to the new tab")
+    public void iClickTheDiscordIconAndNavigateToTheNewTab() {
+        githubLoginPage.clickDiscordIcon();
+    }
+
+    @And("I verify the title contains {string}")
+    public void iVerifyTheTitleContains(String arg0) {
+        assertThat(githubLoginPage.isDiscordHomePageVisible())
+                .as("Discord home page is not visible. Something went wrong.")
+                .isTrue();
+    }
+
+    @And("I close the new tab and switch back to the main tab")
+    public void iCloseTheNewTabAndSwitchBackToTheMainTab() {
+        githubLoginPage.closeChildTabAndSwitchToParentTab();
+    }
+
+    @When("I click the {string} menu link")
+    public void iClickTheMenuLink(String menuLink) {
+        githubLoginPage.clickCommunityMenu();
+    }
+
+    @Then("I verify the text {string} is visible on the page")
+    public void iVerifyTheTextIsVisibleOnThePage(String expText) {
+        String titleText = githubLoginPage.getPWWelcomeText();
+        assertThat(titleText)
+                .as("PW Hero title text validation")
+                .isEqualTo(expText);
     }
 }
