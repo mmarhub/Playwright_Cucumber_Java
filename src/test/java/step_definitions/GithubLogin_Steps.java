@@ -85,4 +85,21 @@ public class GithubLogin_Steps {
                 .as("PW Hero title text validation")
                 .isEqualTo(expText);
     }
+
+    @When("I scroll to the {string} button")
+    public void iScrollToTheButton(String arg0) {
+        githubLoginPage.isTrainingVideosLinkVisible();
+    }
+
+    @Then("I verify the {string} button is visible on the page")
+    public void iVerifyTheButtonIsVisibleOnThePage(String arg0) {
+        assertThat(githubLoginPage.isTrainingVideosLinkVisible())
+                .as("Training Videos link is not visible on the page.")
+                .isTrue();
+    }
+
+    @And("I perform keyboard actions to select all, cut, and paste the username into the password field")
+    public void iPerformKeyboardActionsToSelectAllCutAndPasteTheUsernameIntoThePasswordField() {
+        githubLoginPage.performKeyboardActionsOnLoginFields();
+    }
 }

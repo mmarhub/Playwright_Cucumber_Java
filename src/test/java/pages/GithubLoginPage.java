@@ -14,6 +14,7 @@ public class GithubLoginPage extends BasePage {
     private final String discordSiteHomeIcon = "//header[contains(@class, 'wrapperDesktop')]//a[contains(@class, 'logoLink')]";
     private final String communityMenuLink = "//a[contains(text(), 'Community')]";
     private final String pwWelcomeTitle = "header h1";
+    private final String pwTrainingVideosLink = "//li[@class='footer__item']/a[contains(@href, 'training')]";
 
     public GithubLoginPage(BrowserManager browserManager) {
         super(browserManager);
@@ -77,5 +78,30 @@ public class GithubLoginPage extends BasePage {
 
     public String getPWWelcomeText() {
         return textTrim(pwWelcomeTitle);
+    }
+
+    public boolean isTrainingVideosLinkVisible() {
+        scrollToElement(pwTrainingVideosLink);
+        return isElementVisible(pwTrainingVideosLink);
+    }
+
+    public void performKeyboardActionsOnLoginFields() {
+        // Focus on username input field
+        click(usernameInput);
+
+        // check the os is Mac or Windows/Linux for paste shortcut
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("mac")) {
+            // Use Command (Meta) key for Mac
+            getBrowserManager().getPage().keyboard().press("Meta+A");
+            getBrowserManager().getPage().keyboard().press("Delete");
+        } else {
+            // Use Control key for Windows/Linux
+            getBrowserManager().getPage().keyboard().press("Control+A");
+            getBrowserManager().getPage().keyboard().press("Backspace");
+        }
+
+        // Type random username for checking the cut operation
+        fill(usernameInput, "manual playwright");
     }
 }

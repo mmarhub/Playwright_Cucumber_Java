@@ -67,6 +67,7 @@ public class BasePage {
         return t == null ? null : t.trim();
     }
 
+    // 'page.waitForSelector' method is deprecated, so do not use it.
     public void waitForSelector(String selector, int timeoutMs) {
         getBrowserManager().getPage().waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(timeoutMs));
     }
@@ -97,5 +98,18 @@ public class BasePage {
         Page parentPage = browserManager.getContext().pages().getFirst();
         browserManager.setPage(parentPage);
         browserManager.getPage().bringToFront();
+    }
+
+    public void highlightElement(String selector) {
+        browserManager.getPage().locator(selector).evaluate("el => {" +
+                "el.style.outline = 'thick solid #FF0000'; " +  // Red border
+                "el.style.boxShadow = '0 0 10px #FF0000'; " +   // Optional glow
+                "el.scrollIntoView({block: 'center'});" +       // Ensure center view
+                "}");
+    }
+
+    public void scrollToElement(String selector) {
+        highlightElement(selector);
+        browserManager.getPage().locator(selector).scrollIntoViewIfNeeded();
     }
 }
