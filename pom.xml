@@ -69,6 +69,14 @@
             <artifactId>datafaker</artifactId>
             <version>2.5.2</version>
         </dependency>
+
+        <!-- Apache PDFBox for reading PDF contents in tests -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

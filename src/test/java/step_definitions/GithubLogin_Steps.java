@@ -102,4 +102,16 @@ public class GithubLogin_Steps {
     public void iPerformKeyboardActionsToSelectAllCutAndPasteTheUsernameIntoThePasswordField() {
         githubLoginPage.performKeyboardActionsOnLoginFields();
     }
+
+    @Given("I navigate to the webpage {string}")
+    public void iNavigateToTheWebpage(String url) {
+        githubLoginPage.navigateToHome(url);
+    }
+
+    @When("I download the PDF file and verify the content contains the text {string}")
+    public void iDownloadThePDFFileAndVerifyTheContentContainsTheText(String expectedContent) {
+        assertThat(githubLoginPage.downloadAndValidatePDF(expectedContent))
+                .withFailMessage("PDF content validation failed for expected content: " + expectedContent)
+                .isTrue();
+    }
 }

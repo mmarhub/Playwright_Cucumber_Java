@@ -5,6 +5,15 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import manager.BrowserManager;
+import com.microsoft.playwright.Download;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class BasePage {
 
@@ -111,5 +120,89 @@ public class BasePage {
     public void scrollToElement(String selector) {
         highlightElement(selector);
         browserManager.getPage().locator(selector).scrollIntoViewIfNeeded();
+    }
+
+    /**
+     * Validate that the expected text exists inside a downloaded PDF file.
+     * fileName should be the filename as saved in the downloadedFiles folder (e.g. "sample.pdf").
+     * Returns true if expectedContent is found (case-insensitive); false otherwise.
+     */
+    public boolean validateContentInsidePDFFile(String fileName, String expectedContent) {
+        Path downloadDir = Paths.get(System.getProperty("user.dir"),
+                "src", "test", "resources", "downloadedFiles");
+        Path filePath = downloadDir.resolve(fileName);
+
+        if (!Files.exists(filePath)) {
+            scenarioLog("File not found for validation: " + filePath);
+            return false;
+        }
+
+        if (expectedContent == null || expectedContent.trim().isEmpty()) {
+            scenarioLog("No expected content provided for validation");
+            return false;
+        }
+
+        try (PDDocument document = Loader.loadPDF(filePath.toFile())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(document);
+            if (text == null) text = "";
+
+            boolean found = text.toLowerCase().contains(expectedContent.trim().toLowerCase());
+            if (!found) {
+                scenarioLog("Expected content not found in file: " + fileName);
+            }
+            return found;
+        } catch (Exception e) {
+            scenarioLog("Failed to read/validate file: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Download the file by clicking the locator, then validate that expectedContent exists in the downloaded file.
+     * Returns true only if the file is successfully downloaded and the content validation passes.
+     */
+    public boolean downloadAndValidate(String locator, String expectedContent) {
+        try {
+
+            Path downloadDir = Paths.get(System.getProperty("user.dir"),
+                    "src", "test", "resources", "downloadedFiles");
+            if (!Files.exists(downloadDir)) {
+                Files.createDirectories(downloadDir);
+            }
+
+            final Page page = browserManager.getPage();
+            Download download = page.waitForDownload(() -> page.locator(locator).click());
+
+            String suggested = download.suggestedFilename();
+            if (suggested == null || suggested.isEmpty()) {
+                suggested = "downloaded-file-" + System.currentTimeMillis();
+            }
+
+            Path target = downloadDir.resolve(suggested);
+            if (Files.exists(target)) {
+                Files.delete(target);
+            }
+
+            download.saveAs(target);
+
+            boolean exists = Files.exists(target) && Files.size(target) > 0;
+            if (!exists) {
+                scenarioLog("❌ - Download completed but file not found or empty: " + target);
+                return false;
+            }
+
+            // Delegate to existing validator which reads the file and checks contents
+            boolean validated = validateContentInsidePDFFile(suggested, expectedContent);
+            if (!validated) {
+                scenarioLog("❌ - Downloaded file found but content validation failed for: " + suggested);
+            }
+
+            scenarioLog("✅ - Download and validation succeeded for file: " + suggested);
+            return exists && validated;
+        } catch (Exception e) {
+            scenarioLog("❌ - Download and validation failed due to exception: " + e.getMessage());
+            return false;
+        }
     }
 }

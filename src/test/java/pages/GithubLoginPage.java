@@ -15,6 +15,7 @@ public class GithubLoginPage extends BasePage {
     private final String communityMenuLink = "//a[contains(text(), 'Community')]";
     private final String pwWelcomeTitle = "header h1";
     private final String pwTrainingVideosLink = "//li[@class='footer__item']/a[contains(@href, 'training')]";
+    private final String pdfFileLink = "a[href='download/sample.pdf']";
 
     public GithubLoginPage(BrowserManager browserManager) {
         super(browserManager);
@@ -103,5 +104,9 @@ public class GithubLoginPage extends BasePage {
 
         // Type random username for checking the cut operation
         fill(usernameInput, "manual playwright");
+    }
+
+    public boolean downloadAndValidatePDF(String expectedContent) {
+        return downloadAndValidate(pdfFileLink, expectedContent);
     }
 }

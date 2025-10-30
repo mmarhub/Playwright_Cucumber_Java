@@ -43,3 +43,8 @@ Feature: GitHub Login Functionality
     And I enter username "positive@test.com"
     And I enter password "password123"
     And I perform keyboard actions to select all, cut, and paste the username into the password field
+
+    @pdfvalidation
+    Scenario: Download and validate PDF content
+      Given I navigate to the webpage "https://the-internet.herokuapp.com/download"
+      When I download the PDF file and verify the content contains the text "eleifend velit vitae"
