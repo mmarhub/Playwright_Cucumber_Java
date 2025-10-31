@@ -79,13 +79,29 @@ public class BrowserManager {
     public void setUp(Scenario scn) {
         logger.info("Setting up Playwright...");
 
-        // Get viewport size of screen
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int) screenSize.getWidth();
-        int height = (int) screenSize.getHeight();
+        // Force headless mode if in CI (GitHub Actions sets CI=true)
+        boolean isCI = "true".equalsIgnoreCase(System.getenv("CI"));
 
-        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+        boolean headless = Boolean.parseBoolean(System.getProperty("headless", isCI ? "true" : "false"));
         int slowMo = Integer.parseInt(System.getProperty("slowMo", "0"));
+
+        // Default viewport size
+        int width = 1920;
+        int height = 1080;
+
+        // Only try to get screen size when not in CI
+        if (!isCI) {
+            try {
+                // Get viewport size of screen
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                width = (int) screenSize.getWidth();
+                height = (int) screenSize.getHeight();
+            } catch (HeadlessException e) {
+                logger.warning("Headless environment detected — using default 1920x1080 viewport.");
+            }
+        } else {
+            System.setProperty("java.awt.headless", "true");
+        }
 
         try {
             playwright.set(Playwright.create());
