@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    # avoid retriggering workflow when we push reports back to the repo
+    paths-ignore:
+      - 'reports/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven local repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run tests (Maven)
+        run: mvn -B clean test -DslowMo=500 -Dthread.count=2
+
+      - name: Show target directory (debug)
+        run: ls -la target || true
+
+      - name: Prepare cucumber report for commit
+        run: |
+          set -e
+          REPORT_DIR=reports/cucumber-report
+          mkdir -p "$REPORT_DIR"
+
+          # Try copying common locations where cucumber and the reporting plugin put artifacts
+          cp -r target/site/* "$REPORT_DIR" 2>/dev/null || true
+          cp -r target/*cucumber* "$REPORT_DIR" 2>/dev/null || true
+          cp -r target/*.html "$REPORT_DIR" 2>/dev/null || true
+          cp -r target/*.json "$REPORT_DIR" 2>/dev/null || true
+
+          # List what we will commit
+          echo "Files to commit:"
+          ls -la "$REPORT_DIR" || true
+
+      - name: Commit and push report
+        env:
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+        run: |
+          set -e
+          git config user.name "$GIT_AUTHOR_NAME"
+          git config user.email "$GIT_AUTHOR_EMAIL"
+
+          git add reports/cucumber-report || true
+
+          # If there are staged changes, commit and push. Otherwise do nothing.
+          if git diff --cached --quiet; then
+            echo "No report changes to commit"
+          else
+            git commit -m "Add cucumber report [skip ci]"
+            git push
+          fi
+
