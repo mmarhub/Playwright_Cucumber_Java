@@ -132,8 +132,8 @@ public class BrowserManager {
             page.set(context.get().newPage());
 
             // Set timeouts from properties file
-            int navigationTimeout = Integer.parseInt(properties.getProperty("navigation.timeout", "30000"));
-            int actionTimeout = Integer.parseInt(properties.getProperty("action.timeout", "15000"));
+            int navigationTimeout = Integer.parseInt(properties.getProperty("page.load.timeout", "30000"));
+            int actionTimeout = Integer.parseInt(properties.getProperty("element.action.timeout", "15000"));
             page.get().setDefaultNavigationTimeout(navigationTimeout);
             page.get().setDefaultTimeout(actionTimeout);
 

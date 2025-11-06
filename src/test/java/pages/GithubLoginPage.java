@@ -16,6 +16,8 @@ public class GithubLoginPage extends BasePage {
     private final String pwWelcomeTitle = "header h1";
     private final String pwTrainingVideosLink = "//li[@class='footer__item']/a[contains(@href, 'training')]";
     private final String pdfFileLink = "a[href='download/sample.pdf']";
+    private final String enterpriseMenuBtn = "//nav[@aria-label='Global']//button[contains(text(), 'Enterprise')]";
+    private final String enterprisePlatformSubMenu = "//a[contains(@href, 'enterprise')]//span[contains(text(), 'Enterprise platform')]";
 
     public GithubLoginPage(BrowserManager browserManager) {
         super(browserManager);
@@ -69,7 +71,7 @@ public class GithubLoginPage extends BasePage {
     }
 
     public boolean isDiscordHomePageVisible() {
-        waitForElementVisible(discordSiteHomeIcon, 10000);
+        waitForElementVisibleBySelector(discordSiteHomeIcon, 10000);
         return isElementVisible(discordSiteHomeIcon);
     }
 
@@ -108,5 +110,29 @@ public class GithubLoginPage extends BasePage {
 
     public boolean downloadAndValidatePDF(String expectedContent) {
         return downloadAndValidate(pdfFileLink, expectedContent);
+    }
+
+    public void hoverOverElement(String menuName) {
+        String xpath = "//react-partial[@partial-name='marketing-navigation']" +
+                "//div[@data-target='react-partial.reactRoot']" +
+                "//button[contains(text(), '" + menuName + "')]";
+        Locator locator = getBrowserManager().getPage().locator(xpath);
+        hoverElement(locator);
+    }
+
+    public boolean isSubMenuVisible(String menu, String subMenu) {
+        String xpath = "//a[contains(@href, '" + menu.toLowerCase() + "')]" +
+                "//span[contains(text(), '" + subMenu + "')]";
+        waitForElementVisibleBySelector(xpath);
+        return isElementVisible(xpath);
+    }
+
+    public void hoverOverEnterpriseMenu() {
+        hoverElement(enterpriseMenuBtn);
+    }
+
+    public boolean isEnterprisePlatformSubMenuVisible() {
+        waitForElementVisibleBySelector(enterprisePlatformSubMenu);
+        return isElementVisible(enterprisePlatformSubMenu);
     }
 }

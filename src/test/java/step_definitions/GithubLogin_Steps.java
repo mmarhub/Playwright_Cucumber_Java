@@ -12,6 +12,8 @@ public class GithubLogin_Steps {
 
     private final GithubLoginPage githubLoginPage;
 
+    private String insVarMenuLink;
+
     public GithubLogin_Steps(GithubLoginPage githubLoginPage) {
         this.githubLoginPage = githubLoginPage;
     }
@@ -112,6 +114,31 @@ public class GithubLogin_Steps {
     public void iDownloadThePDFFileAndVerifyTheContentContainsTheText(String expectedContent) {
         assertThat(githubLoginPage.downloadAndValidatePDF(expectedContent))
                 .withFailMessage("PDF content validation failed for expected content: " + expectedContent)
+                .isTrue();
+    }
+
+    @When("I hover over the {string} menu link")
+    public void iHoverOverTheMenuLink(String menuName) {
+        insVarMenuLink = menuName;
+        githubLoginPage.hoverOverElement(menuName);
+    }
+
+    @Then("I verify the {string} submenu is displayed")
+    public void iVerifyTheSubmenuIsDisplayed(String subMenu) {
+        assertThat(githubLoginPage.isSubMenuVisible(insVarMenuLink, subMenu))
+                .withFailMessage("Submenu '" + subMenu + "' is not visible.")
+                .isTrue();
+    }
+
+    @When("I hover over the Enterprise menu link")
+    public void iHoverOverTheEnterpriseMenuLink() {
+        githubLoginPage.hoverOverEnterpriseMenu();
+    }
+
+    @Then("I verify the Enterprise Platform submenu is displayed")
+    public void iVerifyTheEnterprisePlatformSubmenuIsDisplayed() {
+        assertThat(githubLoginPage.isEnterprisePlatformSubMenuVisible())
+                .withFailMessage("Enterprise Platform submenu is not visible.")
                 .isTrue();
     }
 }

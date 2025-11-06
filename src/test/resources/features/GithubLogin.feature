@@ -44,7 +44,17 @@ Feature: GitHub Login Functionality
     And I enter password "password123"
     And I perform keyboard actions to select all, cut, and paste the username into the password field
 
-    @pdfvalidation
-    Scenario: Download and validate PDF content
-      Given I navigate to the webpage "https://the-internet.herokuapp.com/download"
-      When I download the PDF file and verify the content contains the text "eleifend velit vitae"
+  @pdfvalidation
+  Scenario: Download and validate PDF content
+    Given I navigate to the webpage "https://the-internet.herokuapp.com/download"
+    When I download the PDF file and verify the content contains the text "eleifend velit vitae"
+
+  @hover
+  Scenario: Testing the hover function
+    Given I navigate to GitHub homepage
+    When I hover over the "Enterprise" menu link
+    Then I verify the "Enterprise platform" submenu is displayed
+    When I hover over the "Resources" menu link
+    Then I verify the "DevOps" submenu is displayed
+    When I hover over the Enterprise menu link
+    Then I verify the Enterprise Platform submenu is displayed

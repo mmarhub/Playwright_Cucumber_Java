@@ -81,10 +81,28 @@ public class BasePage {
         getBrowserManager().getPage().waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(timeoutMs));
     }
 
-    public void waitForElementVisible(String selector, int timeoutMs) {
+    // Method with custom timeout
+    public void waitForElementVisibleBySelector(String selector, double timeoutMs) {
         browserManager.getPage().locator(selector).waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE)
-                .setTimeout(timeoutMs)); // e.g; 10000 ms timeout
+                .setTimeout(timeoutMs));
+    }
+
+    // Overloaded method with default timeout
+    public void waitForElementVisibleBySelector(String selector) {
+        waitForElementVisibleBySelector(selector, 30000);
+    }
+
+    // Method with custom timeout
+    public void waitForElementVisibleByLocator(Locator locator, double timeoutMs) {
+        locator.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE)
+                .setTimeout(timeoutMs));
+    }
+
+    // Overloaded method with default timeout
+    public void waitForElementVisibleByLocator(Locator locator) {
+        waitForElementVisibleByLocator(locator, 30000);
     }
 
     public boolean isElementVisible(String selector) {
@@ -203,6 +221,20 @@ public class BasePage {
         } catch (Exception e) {
             scenarioLog("❌ - Download and validation failed due to exception: " + e.getMessage());
             return false;
+        }
+    }
+
+    // Method to hover over element, by getting either String or Locator.
+    public void hoverElement(Object element) {
+        if (element instanceof String) {
+            waitForElementVisibleBySelector((String) element);
+            browserManager.getPage().locator((String) element).hover();
+        } else if (element instanceof Locator) {
+            waitForElementVisibleByLocator((Locator) element);
+            ((Locator) element).hover();
+        } else {
+            throw new IllegalArgumentException("Element must be a String selector or Locator instance." +
+                    ", but got: " + element.getClass().getName());
         }
     }
 }
