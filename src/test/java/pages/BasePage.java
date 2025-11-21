@@ -27,6 +27,24 @@ public class BasePage {
         return browserManager;
     }
 
+    // Get an identifier as an object (it could be either string or locator) and return as Locator
+    public Locator getAsLocator(Object identifier) {
+        Page page = browserManager.getPage();
+        Locator locator;
+
+        if (identifier instanceof String) {
+            locator = page.locator((String) identifier);
+        } else if (identifier instanceof Locator) {
+            locator = (Locator) identifier;
+        } else {
+            throw new IllegalArgumentException("Identifier must be a String or Locator instance." +
+                    " But got: " + identifier.getClass().getName());
+        }
+
+        waitForElementVisibleByLocator(locator);
+        return locator;
+    }
+
     public void navigate(String url) {
         browserManager.getPage().navigate(url);
     }
@@ -51,7 +69,8 @@ public class BasePage {
     }
 
     public void fill(String locator, String value) {
-        browserManager.getPage().locator(locator).fill(value);
+        //browserManager.getPage().locator(locator).fill(value);
+        getAsLocator(locator).fill(value);
     }
 
     public void click(String locator) {
