@@ -47,7 +47,7 @@ Feature: GitHub Login Functionality
   @pdfvalidation
   Scenario: Download and validate PDF content
     Given I navigate to the webpage "https://the-internet.herokuapp.com/download"
-    When I download the PDF file and verify the content contains the text "eleifend velit vitae"
+    When I download the PDF file and verify the content contains the text "small demonstration"
 
   @hover
   Scenario: Testing the hover function

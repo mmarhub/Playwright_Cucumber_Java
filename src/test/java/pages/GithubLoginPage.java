@@ -2,6 +2,7 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import manager.BrowserManager;
+import manager.GlobalStorage;
 
 public class GithubLoginPage extends BasePage {
 
@@ -13,14 +14,20 @@ public class GithubLoginPage extends BasePage {
     private final String pwDiscordIcon = "a[aria-label='Discord server']";
     private final String discordSiteHomeIcon = "//header[contains(@class, 'wrapperDesktop')]//a[contains(@class, 'logoLink')]";
     private final String communityMenuLink = "//a[contains(text(), 'Community')]";
-    private final String pwWelcomeTitle = "header h1";
+    private final String pwWelcomeTitle = "article header h1";
     private final String pwTrainingVideosLink = "//li[@class='footer__item']/a[contains(@href, 'training')]";
     private final String pdfFileLink = "a[href='download/sample.pdf']";
     private final String enterpriseMenuBtn = "//nav[@aria-label='Global']//button[contains(text(), 'Enterprise')]";
-    private final String enterprisePlatformSubMenu = "//a[contains(@href, 'enterprise')]//span[contains(text(), 'Enterprise platform')]";
+    private final String enterprisePlatformSubMenu = "li:has(button:has-text(\"Enterprise\")) a:has-text(\"Enterprise platform\")";
 
-    public GithubLoginPage(BrowserManager browserManager) {
+    private final GlobalStorage globalStorage;
+
+    public GithubLoginPage(
+            BrowserManager browserManager,
+            GlobalStorage globalStorage
+    ) {
         super(browserManager);
+        this.globalStorage = globalStorage;
     }
 
     public void navigateToHome(String url) {
@@ -80,6 +87,8 @@ public class GithubLoginPage extends BasePage {
     }
 
     public String getPWWelcomeText() {
+        // get the 'someNumber' from global storage
+        scenarioLog("The someNumber from global storage is : " + globalStorage.getSomeNumber());
         return textTrim(pwWelcomeTitle);
     }
 
@@ -113,18 +122,15 @@ public class GithubLoginPage extends BasePage {
     }
 
     public void hoverOverElement(String menuName) {
-        String xpath = "//react-partial[@partial-name='marketing-navigation']" +
-                "//div[@data-target='react-partial.reactRoot']" +
-                "//button[contains(text(), '" + menuName + "')]";
+        String xpath = "//button[contains(text(), '" + menuName + "')]";
         Locator locator = getBrowserManager().getPage().locator(xpath);
         hoverElement(locator);
     }
 
     public boolean isSubMenuVisible(String menu, String subMenu) {
-        String xpath = "//a[contains(@href, '" + menu.toLowerCase() + "')]" +
-                "//span[contains(text(), '" + subMenu + "')]";
-        waitForElementVisibleBySelector(xpath);
-        return isElementVisible(xpath);
+        String css = "nav[aria-label='Global'] li:has(button:has-text('" + menu + "')) a:has-text('" + subMenu + "')";
+        waitForElementVisibleBySelector(css);
+        return isElementVisible(css);
     }
 
     public void hoverOverEnterpriseMenu() {

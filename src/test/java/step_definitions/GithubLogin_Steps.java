@@ -4,6 +4,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import manager.GlobalStorage;
 import pages.GithubLoginPage;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,11 +12,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GithubLogin_Steps {
 
     private final GithubLoginPage githubLoginPage;
+    private final GlobalStorage globalStorage;
 
     private String insVarMenuLink;
 
-    public GithubLogin_Steps(GithubLoginPage githubLoginPage) {
+    public GithubLogin_Steps(
+            GithubLoginPage githubLoginPage,
+            GlobalStorage globalStorage
+    ) {
         this.githubLoginPage = githubLoginPage;
+        this.globalStorage = globalStorage;
     }
 
     @Given("I navigate to GitHub homepage")
@@ -68,6 +74,8 @@ public class GithubLogin_Steps {
         assertThat(githubLoginPage.isDiscordHomePageVisible())
                 .as("Discord home page is not visible. Something went wrong.")
                 .isTrue();
+        // example of setting a value of 'someNumber' in GlobalStorage
+        globalStorage.setSomeNumber(12345);
     }
 
     @And("I close the new tab and switch back to the main tab")

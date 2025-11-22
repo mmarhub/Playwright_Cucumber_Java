@@ -2,6 +2,51 @@ package manager;
 
 public class GlobalStorage {
 
+    private String randomFirstName;
+    private String randomLastName;
+    private String emailAddress;
+
+    // Example of another variable (if needed in the future).
+    private Integer someNumber;
+
+    // Default constructor (required by PicoContainer)
+    public GlobalStorage() {
+    }
+
+    // Getters and setters for the variables
+    public String getRandomFirstName() {
+        return randomFirstName;
+    }
+
+    public void setRandomFirstName(String randomFirstName) {
+        this.randomFirstName = randomFirstName;
+    }
+
+    public String getRandomLastName() {
+        return randomLastName;
+    }
+
+    public void setRandomLastName(String randomLastName) {
+        this.randomLastName = randomLastName;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public Integer getSomeNumber() {
+        return someNumber;
+    }
+
+    public void setSomeNumber(Integer someNumber) {
+        this.someNumber = someNumber;
+    }
+
+    /*
     // ThreadLocal variables to store data per thread.
     private final ThreadLocal<String> randomFirstName = ThreadLocal.withInitial(() -> null);
     private final ThreadLocal<String> randomLastName = ThreadLocal.withInitial(() -> null);
@@ -32,5 +77,5 @@ public class GlobalStorage {
 
     public void setEmailAddress(String email) {
         this.emailAddress.set(email);
-    }
+    }*/
 }
