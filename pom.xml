@@ -77,6 +77,41 @@
             <version>3.0.6</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Support for reading and writing YAML-encoded data -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+
+        <!-- General data-binding functionality for reading JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+
+        <!-- SnakeYAML for parsing/reading and setting up key values in YAML files -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+        <!-- JSON Path for parsing/reading and setting up json key values in JSON responses/Objects -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+
+        <!-- JSON Assert for validating two JSON responses in tests -->
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <version>1.5.3</version>
+        </dependency>
     </dependencies>
 
     <build>

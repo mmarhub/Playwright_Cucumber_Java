@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 public class BrowserManager {
 
-    // Represents a Playwright instance. used to create browser instances of chromium, firefox, webkit.
-    private static final ThreadLocal<Playwright> playwright = new ThreadLocal<>();
+    // Dependency on PlaywrightManager to manage the Playwright instance.
+    private final PlaywrightManager playwrightManager;
 
     // Represents a browser instance. used to create browser contexts.
     private static final ThreadLocal<Browser> browser = new ThreadLocal<>();
@@ -27,13 +27,20 @@ public class BrowserManager {
     // Represents a single tab or page within a browser context.
     private static final ThreadLocal<Page> page = new ThreadLocal<>();
 
+    // Represents the current Cucumber scenario for browser tests.
     private static final ThreadLocal<Scenario> scenario = new ThreadLocal<>();
 
     public Properties properties;
     private static final Logger logger = Logger.getLogger(BrowserManager.class.getName());
 
-    // Constructor to load properties from a configuration file.
-    public BrowserManager() {
+    // Constructor to load properties from a configuration file with PlaywrightManager dependency.
+    public BrowserManager(PlaywrightManager playwrightManager) {
+        this.playwrightManager = playwrightManager;
+        loadProperties();
+    }
+
+    // Method to load properties from a configuration file.
+    private void loadProperties() {
         properties = new Properties();
         // creates a path to a configuration file. If "config.path" isn't set,
         // it defaults to a file located in "src/main/resources/config.properties
@@ -79,6 +86,9 @@ public class BrowserManager {
     public void setUp(Scenario scn) {
         logger.info("Setting up Playwright...");
 
+        // Initializing the shared Playwright instance
+        playwrightManager.initialize();
+
         // Force headless mode if in CI (GitHub Actions sets CI=true)
         boolean isCI = "true".equalsIgnoreCase(System.getenv("CI"));
 
@@ -104,7 +114,8 @@ public class BrowserManager {
         }
 
         try {
-            playwright.set(Playwright.create());
+            //playwright.set(Playwright.create());
+            Playwright pw = playwrightManager.getPlaywright();
 
             String browserType = properties.getProperty("browser", "chromium");
             BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
@@ -114,17 +125,17 @@ public class BrowserManager {
 
             switch (browserType.toLowerCase()) {
                 case "chromium":
-                    browser.set(playwright.get().chromium().launch(launchOptions));
+                    browser.set(pw.chromium().launch(launchOptions));
                     break;
                 case "firefox":
-                    browser.set(playwright.get().firefox().launch(launchOptions));
+                    browser.set(pw.firefox().launch(launchOptions));
                     break;
                 case "webkit":
-                    browser.set(playwright.get().webkit().launch(launchOptions));
+                    browser.set(pw.webkit().launch(launchOptions));
                     break;
                 default:
                     logger.warning("Unsupported browser type: " + browserType + ". Defaulting to chromium.");
-                    browser.set(playwright.get().chromium().launch(launchOptions));
+                    browser.set(pw.chromium().launch(launchOptions));
                     break;
             }
             context.set(browser.get().newContext(new Browser.NewContextOptions().setViewportSize(width, height)));
@@ -149,17 +160,21 @@ public class BrowserManager {
     // Method to tear down Playwright, browser, context, and page after each test.
     public void tearDown() {
         try {
-            logger.info("Tearing down Playwright...");
+            logger.info("Tearing down Browser...");
 
             if (scenario.get() != null) scenario.remove();
             if (page.get() != null) page.get().close();
             if (context.get() != null) context.get().close();
             if (browser.get() != null) browser.get().close();
-            if (playwright.get() != null) playwright.get().close();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to close Playwright resources.", e);
+        } finally {
+            // Clean up ThreadLocal variables
+            System.out.println("Finalizing Playwright teardown...");
+            page.remove();
+            context.remove();
+            browser.remove();
         }
-
-        logger.info("Playwright teardown complete!");
+        logger.info("Browser teardown complete!");
     }
 }

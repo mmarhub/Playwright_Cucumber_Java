@@ -1,0 +1,25 @@
+---
+
+Base:
+  OAuthBaseURL: "https://api-m.sandbox.paypal.com"
+  tranBaseURL: "https://api-m.sandbox.paypal.com"
+  timeout: 30000
+
+OAuthAPIHeaders:
+  Content-Type: "application/x-www-form-urlencoded"
+  Accept: "application/json"
+
+tranAPIHeaders:
+  Content-Type: "application/json"
+  Accept: "application/json"
+
+OAuthBodyForm:
+  grant_type: "client_credentials"
+
+OAuthSecrets:
+  client_id: "your_client_id_here"
+  client_secret: "your_client_secret_here"
+
+APIAuth:
+  APIUsername: "YOUR_API_USERNAME"
+  APIPassword: "YOUR_API_PASSWORD"

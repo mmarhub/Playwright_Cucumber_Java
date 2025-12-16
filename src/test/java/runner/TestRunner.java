@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 @CucumberOptions(
         features = "src/test/resources/features",
         glue = {"step_definitions", "hooks"},
-        tags = "@keyActions and not @ignore",
+        tags = "@api and not @ignore",
         plugin = {"pretty",
                 "html:target/site/cucumber-pretty",
                 "json:target/cucumber.json"

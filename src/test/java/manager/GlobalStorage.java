@@ -1,10 +1,16 @@
 package manager;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.HashMap;
+
 public class GlobalStorage {
 
     private String randomFirstName;
     private String randomLastName;
     private String emailAddress;
+    private JsonNode inputReqResContent;
+    private final HashMap<String, String> dataStorage = new HashMap<>();
 
     // Example of another variable (if needed in the future).
     private Integer someNumber;
@@ -44,6 +50,22 @@ public class GlobalStorage {
 
     public void setSomeNumber(Integer someNumber) {
         this.someNumber = someNumber;
+    }
+
+    public JsonNode getInputReqResContent() {
+        return inputReqResContent;
+    }
+
+    public void setInputReqResContent(JsonNode inputReqResContent) {
+        this.inputReqResContent = inputReqResContent;
+    }
+
+    public HashMap<String, String> getDataStorage() {
+        return dataStorage;
+    }
+
+    public void setDataStorage(String key, String value) {
+        this.dataStorage.put(key, value);
     }
 
     /*
