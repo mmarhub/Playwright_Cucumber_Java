@@ -80,6 +80,7 @@ public class PaypalAPI_Steps {
                 "🛠️ API Client Setup");
     }
 
+    @SuppressWarnings("unchecked")
     @Then("I get the {string} content from {string} file for the scenario {string}")
     public void iGetTheContentFromFileForTheScenario(String contentType, String fileName, String scenarioName) {
         String normalizedType = contentType.trim().toLowerCase();
@@ -92,68 +93,28 @@ public class PaypalAPI_Steps {
             throw new IllegalArgumentException("Invalid content type: " + contentType + ". Must be 'request' or 'response'.");
         }
 
-        // Load the yaml file
+        // Load the YAML file and parse the scenario data
         JsonUtils.loadYamlFile(fileName);
 
-        // Get the scenario data as an Object and cast it to either Map or ArrayList based on the structure
+        // Retrieve the scenario object and convert it to Object
         Object scenarioObj = JsonUtils.getScenarioAsObject(scenarioName);
+        JsonNode jsonContent;
+
+        // Convert the scenario object to JsonNode based on its type
         if (scenarioObj instanceof Map) {
-            // It's a Map
-            Map<String, Object> scenarioData = (Map<String, Object>) scenarioObj;
-
-            // Convert the Map to a JsonNode and this will be used as our request/response json content
-            JsonNode jsonContent = JsonUtils.toJsonNode(scenarioData);
-
-            // Store the jsonContent in GlobalStorage and use it later in the API steps
-            // For example, if it's a request, you might want to store it in a variable
-            // in GlobalStorage for later use when making the API call.
-            // You would need to inject GlobalStorage into this class via constructor injection.
-            globalStorage.setInputReqResContent(jsonContent);
-            apiManager.getScenario().attach(
-                    jsonContent.toPrettyString(),
-                    "application/json",
-                    "📄 Loaded " + contentType +
-                            " for Scenario " + scenarioName +
-                            " from file: " + fileName);
-            return;
+            jsonContent = JsonUtils.toJsonNode((Map<String, Object>) scenarioObj);
         } else if (scenarioObj instanceof List) {
-            // It's a List
-            List<Object> scenarioData = (List<Object>) scenarioObj;
-
-            // Convert the List to a JsonNode and this will be used as our request/response json content
-            JsonNode jsonContent = JsonUtils.toJsonNode(scenarioData);
-
-            // Store the jsonContent in GlobalStorage and use it later in the API steps
-            // For example, if it's a request, you might want to store it in a variable
-            // in GlobalStorage for later use when making the API call.
-            // You would need to inject GlobalStorage into this class via constructor injection.
-            globalStorage.setInputReqResContent(jsonContent);
-            apiManager.getScenario().attach(
-                    jsonContent.toPrettyString(),
-                    "application/json",
-                    "📄 Loaded " + contentType +
-                            " for Scenario " + scenarioName +
-                            " from file: " + fileName);
-            return;
+            jsonContent = JsonUtils.toJsonNode((List<Object>) scenarioObj);
         } else {
             throw new IllegalArgumentException("Unsupported scenario data structure: " + scenarioObj.getClass().getName());
         }
-        //Map<String, Object> scenarioData = JsonUtils.getScenario(scenarioName);
 
-        // Convert the Map to a JsonNode and this will be used as our request/response json content
-        //JsonNode jsonContent = JsonUtils.toJsonNode(scenarioData);
-
-        // Store the jsonContent in GlobalStorage and use it later in the API steps
-        // For example, if it's a request, you might want to store it in a variable
-        // in GlobalStorage for later use when making the API call.
-        // You would need to inject GlobalStorage into this class via constructor injection.
-        /*globalStorage.setInputReqResContent(jsonContent);
+        // Store the JsonNode content in GlobalStorage
+        globalStorage.setInputReqResContent(jsonContent);
         apiManager.getScenario().attach(
                 jsonContent.toPrettyString(),
                 "application/json",
-                "📄 Loaded " + contentType +
-                        " for Scenario " + scenarioName +
-                        " from file: " + fileName);*/
+                "📄 Loaded " + contentType + " for Scenario " + scenarioName + " from file: " + fileName);
     }
 
     @Then("I make a {string} call with OAuth token and capture the response")
@@ -207,11 +168,11 @@ public class PaypalAPI_Steps {
         } else {
             String responseBody = apiResponse.text();
             // convert the response body to pretty JSON string for better readability in the report
-            String responseJson = JsonUtils.toJsonString(responseBody);
+            JsonNode prettyJsonResponse = JsonUtils.parseJsonString(responseBody);
 
             // Attach the response body to the Cucumber report for visibility
             apiManager.getScenario().attach(
-                    responseBody,
+                    prettyJsonResponse.toPrettyString(),
                     "application/json",
                     "📝 API Response");
         }
@@ -283,7 +244,6 @@ public class PaypalAPI_Steps {
         }
 
         // Iterate through each row in the DataTable to update the payload
-        String jsonPrettyString = requestPayload.toPrettyString();
         for (Map<String, String> row : dataTable.asMaps(String.class, String.class)) {
             String jsonPath = row.get("jsonPath");
             String newValue = row.get("value");
@@ -295,7 +255,6 @@ public class PaypalAPI_Steps {
             }
 
             try {
-                //jsonPrettyString = JsonHelper.setValue(jsonPrettyString, jsonPath, newValue);
                 JsonUtils.updateStringAtPointer(requestPayload, jsonPath, newValue);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to set value at JsonPath: " + jsonPath, e);
@@ -303,12 +262,9 @@ public class PaypalAPI_Steps {
         }
 
         // Convert the modified payload back to JsonNode and store it in GlobalStorage
-        JsonNode modifiedPayload = JsonUtils.toJsonNode(jsonPrettyString);
-        //globalStorage.setInputReqResContent(modifiedPayload);
         globalStorage.setInputReqResContent(requestPayload);
 
         apiManager.getScenario().attach(
-                //modifiedPayload.asText(),
                 requestPayload.toPrettyString(),
                 "application/json",
                 "✏️ Modified Request Payload");
