@@ -1,9 +1,9 @@
-# Playwright BDD Test Automation Framework
+# 🎭 Playwright BDD Test Automation Framework
 
-## Project Description
+## 📝 Project Description
 This is a modern test automation framework that combines Playwright with Cucumber BDD for end-to-end testing. The framework is built using Java and incorporates best practices for web automation testing, including page object model design pattern and BDD approach.
 
-## Technologies Used
+## 🛠 Technologies Used
 - Java 21
 - Playwright (v1.55.0) - Modern browser automation library
 - Cucumber (v7.30.0) - BDD test framework
@@ -13,12 +13,12 @@ This is a modern test automation framework that combines Playwright with Cucumbe
 - DataFaker - Test data generation
 - PicoContainer - Dependency injection
 
-## Prerequisites
+## 🚨 Prerequisites
 - Java JDK 21 or higher
 - Maven 3.8 or higher
 - Any IDE that supports Java (IntelliJ IDEA recommended)
 
-## Installation Steps
+## 🧰 Installation Steps
 1. Clone the repository
 ```bash
 git clone <repository-url>
@@ -31,7 +31,7 @@ mvn clean install
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"
 ```
 
-## Running Tests
+## 🧪 Running Tests
 
 ### Run Complete Test Suite
 ```bash
@@ -70,7 +70,7 @@ To run a specific feature file:
 mvn clean test -Dcucumber.features="src/test/resources/features/Login.feature"
 ```
 
-## Project Structure
+## 📂 Project Structure
 ```
 src/
 ├── test/
@@ -86,14 +86,87 @@ src/
         └── properties/     # Configuration files
 ```
 
-## Configuration
+## ⚙️ Configuration
 The framework can be configured through `src/test/resources/properties/config.properties` file where you can set:
 - Browser type
 - Base URL
 - Timeout values
 - Environment specific configuration
 
-## Reports
+## 📊 Reports
 After test execution, you can find the reports in:
 - Cucumber HTML reports: `target/cucumber-reports`
 - TestNG reports: `target/surefire-reports`
+
+---
+
+<!-- API badge and header image -->
+
+[![API Tests](https://img.shields.io/badge/API%20Tests-Playwright%20API-blue?style=for-the-badge)](#api-automation)
+
+## API Automation
+
+### 👀 Overview
+This framework also includes a standalone API automation suite implemented with Playwright's APIRequest and Cucumber BDD. The API tests live alongside the web tests but can run independently. They follow the same project conventions (Cucumber features, step definitions, TestNG runner and Maven execution) so getting started is consistent with the web automation flow.
+
+### 🚀 Quick Start — Run API Tests
+Prerequisites: make sure Playwright (and its browsers) is installed (same install step used for web tests).
+
+Install dependencies and Playwright (if not already done):
+
+```bash
+mvn clean install
+```
+
+Run API scenarios by Cucumber tag (if your API scenarios use tags like @api):
+
+```bash
+mvn clean test -Dcucumber.filter.tags="@api"
+```
+
+Run a single API scenario or scenario line (same approach as web features):
+
+```bash
+mvn clean test -Dcucumber.features="src/test/resources/features/<filename>.feature:10"
+```
+
+Tip: you can combine with other system properties used across the project (for example `-Dheadless=true`, `-Dthread.count=2`), though API tests are not browser-dependent.
+
+### 🌐 Configuration & Environment
+API-specific configuration is held in `src/test/resources/properties/restconfig_properties.yml` and the generic `src/test/resources/properties/config.properties` used across the framework.
+
+Key config items you may need to update:
+- Base API URL / host
+- OAuth/client credentials (if used by scenarios)
+- Default timeouts and retry settings
+
+You can override some values at runtime using system properties when invoking Maven. For secrets or CI usage, prefer environment variables or your CI secret manager.
+
+### 📬 Requests & Responses (Samples)
+Sample request payloads and expected responses are stored as YAML for easy reuse and readability:
+
+- Requests: `src/test/resources/apiRequests/ScenarioRequests.yml`
+- Expected responses: `src/test/resources/apiResponses/ScenarioResponses.yml`
+
+Feature file(s) driving the API scenarios:
+- `src/test/resources/features/<filename>.feature`
+
+### 📑 Reports & Artifacts
+API test execution produces the same style of Cucumber reports used by the web suite. After a run you can find results here (same report location):
+
+- JSON: `reports/cucumber-report/cucumber-pretty/cucumber.json`
+- HTML: `reports/cucumber-report/cucumber-html-reports/` (open `overview-features.html` or relevant feature-level report)
+
+If you run Maven locally, `target` may also contain generated test artifacts depending on your Maven/Cucumber plugin configuration.
+
+---
+
+## 📚 Additional Resources
+
+- [Playwright Docs](https://playwright.dev)
+- [Playwright API Testing](https://playwright.dev/docs/api-testing)
+- [Cucumber Docs](https://cucumber.io/docs/cucumber/)
+
+---
+
+**Happy Testing! 🎉**
